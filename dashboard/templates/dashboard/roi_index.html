@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .roi-shell {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .roi-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.38rem 0.78rem;
+        border-radius: 999px;
+        background: rgba(21, 32, 51, 0.06);
+        color: #5b677b;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .roi-title {
+        font-size: clamp(2rem, 4vw, 3.1rem);
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin: 0.85rem 0 0.55rem;
+    }
+
+    .roi-subtitle {
+        color: #607086;
+        max-width: 60rem;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+    }
+
+    .context-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 1.2rem 1.3rem;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(21, 32, 51, 0.06);
+        box-shadow: 0 18px 40px rgba(27, 39, 56, 0.08);
+        backdrop-filter: blur(14px);
+    }
+
+    .context-item small,
+    .roi-stat-card small,
+    .signal-chip small,
+    .insight-card small {
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #738095;
+        margin-bottom: 0.28rem;
+        font-size: 0.74rem;
+    }
+
+    .context-item strong {
+        color: #1a263b;
+        font-size: 1.02rem;
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+        gap: 1.5rem;
+    }
+
+    .roi-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 30px;
+        padding: 1.8rem;
+        color: #fff;
+        background: linear-gradient(135deg, #0f7bff 0%, #4a94ff 100%);
+        box-shadow: 0 22px 50px rgba(28, 58, 103, 0.18);
+    }
+
+    .roi-hero::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -70px;
+        top: -100px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        filter: blur(4px);
+    }
+
+    .hero-topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .hero-value {
+        font-size: clamp(2.8rem, 6vw, 4.6rem);
+        line-height: 0.95;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin: 0.7rem 0 0.8rem;
+    }
+
+    .hero-note {
+        max-width: 42rem;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .hero-stat {
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-stat strong {
+        display: block;
+        font-size: 1.12rem;
+    }
+
+    .side-stack {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .roi-stat-card,
+    .insight-card,
+    .leader-panel,
+    .assumption-panel,
+    .history-panel {
+        border-radius: 28px;
+        padding: 1.35rem;
+        background: rgba(255, 255, 255, 0.84);
+        border: 1px solid rgba(21, 32, 51, 0.06);
+        box-shadow: 0 18px 40px rgba(27, 39, 56, 0.08);
+        backdrop-filter: blur(14px);
+    }
+
+    .roi-stat-card strong {
+        display: block;
+        font-size: 2.05rem;
+        line-height: 1;
+        color: #16233a;
+        margin-bottom: 0.45rem;
+    }
+
+    .roi-stat-card p,
+    .insight-card p {
+        color: #5f6d82;
+        margin-bottom: 0;
+    }
+
+    .insight-card {
+        background: linear-gradient(180deg, rgba(21, 32, 51, 0.92), rgba(38, 50, 69, 0.94));
+        color: white;
+    }
+
+    .insight-card small {
+        color: rgba(255, 255, 255, 0.64);
+    }
+
+    .insight-card h3 {
+        margin: 0.2rem 0 0.65rem;
+        font-size: 1.55rem;
+    }
+
+    .insight-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(241, 179, 79, 0.16);
+        color: #ffd997;
+        font-weight: 700;
+        font-size: 0.84rem;
+        margin-top: 1rem;
+    }
+
+    .panel-heading {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-end;
+        margin-bottom: 1rem;
+    }
+
+    .panel-heading h3 {
+        margin: 0.2rem 0 0.25rem;
+        font-size: 1.4rem;
+        letter-spacing: -0.03em;
+    }
+
+    .panel-heading p {
+        color: #738095;
+        margin-bottom: 0;
+    }
+
+    .leader-table thead th {
+        color: #718097;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 0;
+    }
+
+    .leader-table tbody tr {
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    .model-pill,
+    .signal-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.42rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(21, 32, 51, 0.06);
+        color: #223045;
+        font-weight: 700;
+        font-size: 0.82rem;
+    }
+
+    .signal-chip--long {
+        background: rgba(15, 138, 84, 0.12);
+        color: #0f8a54;
+    }
+
+    .signal-chip--short {
+        background: rgba(171, 74, 46, 0.12);
+        color: #ab4a2e;
+    }
+
+    .signal-chip--flat {
+        background: rgba(21, 32, 51, 0.07);
+        color: #516074;
+    }
+
+    .thought-list,
+    .history-list {
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .thought-card,
+    .history-card {
+        padding: 1rem 1.05rem;
+        border-radius: 20px;
+        background: rgba(247, 249, 252, 0.94);
+        border: 1px solid rgba(21, 32, 51, 0.06);
+    }
+
+    .thought-card strong,
+    .history-card strong {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #1d293d;
+    }
+
+    .thought-card p,
+    .history-card p {
+        color: #5f6d82;
+        margin-bottom: 0;
+    }
+
+    .empty-state {
+        padding: 1.2rem;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.84);
+        border: 1px solid rgba(21, 32, 51, 0.06);
+        color: #5f6d82;
+        box-shadow: 0 18px 40px rgba(27, 39, 56, 0.08);
+    }
+
+    @media (max-width: 1199.98px) {
+        .context-strip,
+        .hero-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hero-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .context-strip,
+        .hero-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-topline,
+        .panel-heading {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="roi-shell">
+    <div class="d-flex justify-content-between flex-wrap align-items-end gap-3 border-bottom pb-3">
+        <div>
+            <div class="roi-kicker">Business Impact View</div>
+            <h1 class="roi-title">ROI & Strategy Performance</h1>
+            <p class="roi-subtitle">This page converts hourly forecasts into actual trade decisions, charges friction, and ranks models by money made, drawdown avoided, and execution quality.</p>
+        </div>
+    </div>
+
+    {% if best_strategy %}
+    <div class="context-strip">
+        <div class="context-item">
+            <small>Replay Window</small>
+            <strong>{{ best_strategy.window_start|date:"Y-m-d H:i" }} to {{ best_strategy.window_end|date:"Y-m-d H:i" }}</strong>
+        </div>
+        <div class="context-item">
+            <small>Initial Capital</small>
+            <strong>${{ assumptions.capital|floatformat:0 }}</strong>
+        </div>
+        <div class="context-item">
+            <small>Trade Gate</small>
+            <strong>{{ assumptions.threshold_pct|floatformat:2 }}% move threshold</strong>
+        </div>
+        <div class="context-item">
+            <small>Market Coverage</small>
+            <strong>{{ context_data.coverage_start|date:"Y-m-d H:i" }} to {{ context_data.coverage_end|date:"Y-m-d H:i" }}</strong>
+        </div>
+    </div>
+
+    <div class="hero-grid">
+        <section class="roi-hero">
+            <div class="hero-topline">
+                <div>
+                    <div class="roi-kicker" style="background: rgba(255,255,255,0.14); color: white;">Top Replay Outcome</div>
+                    <h2 class="mb-0">{{ best_strategy.model_name }}</h2>
+                </div>
+                <div class="hero-chip">{{ best_strategy.source_label }} strategy</div>
+            </div>
+            <div class="hero-value">${{ best_strategy.net_profit_usd|floatformat:2 }}</div>
+            <p class="hero-note">{{ recommendation.summary }}</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <small>Return</small>
+                    <strong>{{ best_strategy.return_pct|floatformat:2 }}%</strong>
+                </div>
+                <div class="hero-stat">
+                    <small>Risk Reduction</small>
+                    <strong>{{ best_strategy.risk_reduction_pct|floatformat:1 }}%</strong>
+                </div>
+                <div class="hero-stat">
+                    <small>Win Rate</small>
+                    <strong>{{ best_strategy.win_rate_pct|floatformat:1 }}%</strong>
+                </div>
+                <div class="hero-stat">
+                    <small>Live Bias</small>
+                    <strong>{{ best_strategy.latest_signal }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <aside class="side-stack">
+            <div class="insight-card">
+                <small>Recommendation</small>
+                <h3>{{ recommendation.title }}</h3>
+                <p>{{ recommendation.summary }}</p>
+                <div class="insight-badge">{{ recommendation.confidence_label }}</div>
+            </div>
+            <div class="roi-stat-card">
+                <small>Benchmark Gap</small>
+                <strong>${{ best_strategy.profit_vs_benchmark_usd|floatformat:2 }}</strong>
+                <p>Difference between the top strategy and simple buy-and-hold over the same window.</p>
+            </div>
+            <div class="roi-stat-card">
+                <small>Signal Accuracy</small>
+                <strong>{{ best_strategy.signal_accuracy_pct|floatformat:1 }}%</strong>
+                <p>How often the model got the direction right on hours where it actually took a trade.</p>
+            </div>
+        </aside>
+    </div>
+
+    <section class="leader-panel">
+        <div class="panel-heading">
+            <div>
+                <div class="roi-kicker">Model Leaderboard</div>
+                <h3>Which forecast is commercially strongest?</h3>
+                <p>Money after fees matters more than raw MSE here. A better model is one that survives execution friction.</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table leader-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Style</th>
+                        <th>Net Profit</th>
+                        <th>Return</th>
+                        <th>Benchmark</th>
+                        <th>Drawdown</th>
+                        <th>Gate</th>
+                        <th>Trades</th>
+                        <th>Signal Mix</th>
+                        <th>Current Bias</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for strategy in strategies %}
+                    <tr>
+                        <td><strong>{{ strategy.model_name }}</strong></td>
+                        <td><span class="model-pill">{{ strategy.source_label }}</span></td>
+                        <td>${{ strategy.net_profit_usd|floatformat:2 }}</td>
+                        <td>{{ strategy.return_pct|floatformat:2 }}%</td>
+                        <td>${{ strategy.benchmark_profit_usd|floatformat:2 }}</td>
+                        <td>{{ strategy.max_drawdown_pct|floatformat:2 }}%</td>
+                        <td>{{ strategy.model_threshold_pct|floatformat:3 }}%</td>
+                        <td>{{ strategy.trades }}</td>
+                        <td>{{ strategy.long_trades }}L / {{ strategy.short_trades }}S</td>
+                        <td>
+                            <span class="signal-chip {% if strategy.latest_signal == 'Long' %}signal-chip--long{% elif strategy.latest_signal == 'Short' %}signal-chip--short{% else %}signal-chip--flat{% endif %}">
+                                {{ strategy.latest_signal }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-xl-7">
+            <section class="assumption-panel h-100">
+                <div class="panel-heading">
+                    <div>
+                        <div class="roi-kicker">How It Works</div>
+                        <h3>Minimal assumptions, useful output</h3>
+                        <p>The goal is not a perfect backtest. The goal is a fast and honest read on whether the forecast can survive a simple rule.</p>
+                    </div>
+                </div>
+                <div class="thought-list">
+                    <div class="thought-card">
+                        <strong>Decision rule</strong>
+                        <p>Each model uses a confidence gate based on the larger of a {{ assumptions.threshold_pct|floatformat:2 }}% floor or its own {{ assumptions.signal_quantile_pct|floatformat:0 }}th-percentile predicted move. That keeps quiet models active and prevents noisy ones from trading every hour.</p>
+                    </div>
+                    <div class="thought-card">
+                        <strong>Execution friction</strong>
+                        <p>Each active trade pays {{ assumptions.fee_pct|floatformat:2 }}% in simulated cost. This prevents unrealistic “paper alpha” from overtrading.</p>
+                    </div>
+                    <div class="thought-card">
+                        <strong>My thinking</strong>
+                        <p>Good ROI pages on strong finance products usually separate forecasting quality from decision quality. I followed that pattern here: the user sees forecast models above, but this page answers whether those signals actually improve capital and risk once translated into action.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-xl-5">
+            <section class="history-panel h-100">
+                <div class="panel-heading">
+                    <div>
+                        <div class="roi-kicker">Snapshots</div>
+                        <h3>Best-strategy history</h3>
+                        <p>Recent saved winners so the page leaves an audit trail instead of showing only the latest state.</p>
+                    </div>
+                </div>
+                <div class="history-list">
+                    {% for entry in history %}
+                    <div class="history-card">
+                        <strong>{{ entry.model_version }}</strong>
+                        <p>Profit: ${{ entry.simulated_profit_usd|floatformat:2 }} | Risk reduction: {{ entry.risk_reduction_pct|floatformat:1 }}%</p>
+                        <p>{{ entry.period }} | {{ entry.calculated_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                    {% empty %}
+                    <div class="history-card">
+                        <strong>No snapshots yet</strong>
+                        <p>Open this page after generating the model bundles to store the first ROI snapshot.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        No ROI simulation is available yet. Generate the hourly model bundles first, then reload this page.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

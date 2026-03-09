@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .ab-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.35rem;
+    }
+
+    .ab-subtitle {
+        color: #5e6a7d;
+        max-width: 58rem;
+        margin-bottom: 0;
+    }
+
+    .ab-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(21, 32, 51, 0.06);
+        color: #526072;
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.8rem;
+    }
+
+    .ab-hero,
+    .ab-form-card,
+    .ab-panel,
+    .summary-card {
+        border-radius: 28px;
+        overflow: hidden;
+    }
+
+    .ab-hero {
+        min-height: 100%;
+        padding: 1.6rem;
+        color: #fff;
+        background: linear-gradient(135deg, #1d4ed8 0%, #3294ff 100%);
+        box-shadow: 0 18px 40px rgba(27, 39, 56, 0.12);
+    }
+
+    .ab-hero p {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .ab-hero-grid,
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+        margin-top: 1.25rem;
+    }
+
+    .ab-hero-stat,
+    .summary-stat {
+        padding: 0.9rem 1rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .ab-hero-stat small,
+    .summary-stat small {
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        opacity: 0.82;
+        margin-bottom: 0.3rem;
+    }
+
+    .ab-hero-stat strong,
+    .summary-stat strong {
+        display: block;
+        font-size: 1.1rem;
+    }
+
+    .ab-form-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(240, 245, 252, 0.9));
+        box-shadow: 0 18px 40px rgba(27, 39, 56, 0.08);
+    }
+
+    .ab-form-card .form-control {
+        border-radius: 16px;
+        border-color: rgba(21, 32, 51, 0.08);
+        padding: 0.85rem 1rem;
+    }
+
+    .ab-form-card .form-text {
+        color: #67748a;
+    }
+
+    .summary-card {
+        padding: 1.25rem;
+        min-height: 100%;
+        color: #fff;
+        box-shadow: 0 18px 40px rgba(27, 39, 56, 0.08);
+    }
+
+    .summary-card--active { background: linear-gradient(135deg, #15233b 0%, #314662 100%); }
+    .summary-card--uplift { background: linear-gradient(135deg, #0f8a54 0%, #25a65b 100%); }
+    .summary-card--best { background: linear-gradient(135deg, #885822 0%, #a8723a 100%); }
+
+    .summary-value {
+        font-size: 2.25rem;
+        font-weight: 800;
+        line-height: 1;
+        margin: 0.75rem 0;
+    }
+
+    .panel-title {
+        font-size: 1.45rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+    }
+
+    .panel-note {
+        color: #738095;
+        margin-bottom: 0;
+    }
+
+    .test-table {
+        margin-bottom: 0;
+    }
+
+    .test-table thead th {
+        color: #5d6980;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 0;
+    }
+
+    .test-row {
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(21, 32, 51, 0.06);
+    }
+
+    .version-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(21, 32, 51, 0.06);
+        color: #223045;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        padding: 1rem 1.05rem;
+        border-radius: 18px;
+        background: rgba(248, 250, 253, 0.92);
+        border: 1px dashed rgba(21, 32, 51, 0.12);
+        color: #738095;
+    }
+</style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <div class="ab-kicker">Experiment Workspace</div>
+        <h1 class="ab-title">A/B Testing Dashboard</h1>
+        <p class="ab-subtitle">Compare challenger models against the current control using tracked MSE values, then keep only the winners that actually improve hourly forecast quality.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-5">
+        <div class="ab-hero">
+            <div class="ab-kicker" style="background: rgba(255,255,255,0.14); color: white;">How to use this page</div>
+            <h3 class="mb-3">Launch, compare, and close tests quickly.</h3>
+            <p class="mb-0">Use the form to start a comparison, treat lower MSE as better, and close an active test once the treatment has clearly won or lost.</p>
+            <div class="ab-hero-grid">
+                <div class="ab-hero-stat">
+                    <small>Decision Rule</small>
+                    <strong>Lower MSE wins</strong>
+                </div>
+                <div class="ab-hero-stat">
+                    <small>Active Tests</small>
+                    <strong>{{ summary.active_count }}</strong>
+                </div>
+                <div class="ab-hero-stat">
+                    <small>Average Uplift</small>
+                    <strong>{{ summary.avg_uplift|floatformat:2 }}%</strong>
+                </div>
+                <div class="ab-hero-stat">
+                    <small>Latest Launch</small>
+                    <strong>{% if summary.latest_launch %}{{ summary.latest_launch|date:"Y-m-d H:i" }}{% else %}N/A{% endif %}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-7">
+        <div class="card ab-form-card h-100">
+            <div class="card-header">
+                <div class="ab-kicker mb-2">Start New Test</div>
+                <h5 class="panel-title mb-1">Create an A/B comparison</h5>
+                <p class="panel-note">Enter the control and challenger MSE values. Improvement is calculated automatically.</p>
+            </div>
+            <div class="card-body">
+                {% if form_error %}
+                <div class="alert alert-danger rounded-4">{{ form_error }}</div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Test Name</label>
+                            <input class="form-control" type="text" name="test_name" placeholder="GRU vs Linear Hourly" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Control Model</label>
+                            <input class="form-control" type="text" name="control_model_version" placeholder="Linear Regression" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Treatment Model</label>
+                            <input class="form-control" type="text" name="treatment_model_version" placeholder="GRU" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Control MSE</label>
+                            <input class="form-control" type="number" step="any" name="control_mse" placeholder="213408.3075" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Treatment MSE</label>
+                            <input class="form-control" type="number" step="any" name="treatment_mse" placeholder="0.0201" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-text">Tip: use the latest validation or test MSE from the dashboard runs section so comparisons stay consistent.</div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary rounded-pill px-4 py-2" type="submit">Start New A/B Test</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="summary-card summary-card--active">
+            <small class="text-uppercase opacity-75">Active Tests</small>
+            <div class="summary-value">{{ summary.active_count }}</div>
+            <div>Tests still gathering evidence.</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-card summary-card--uplift">
+            <small class="text-uppercase opacity-75">Average Uplift</small>
+            <div class="summary-value">{{ summary.avg_uplift|floatformat:2 }}%</div>
+            <div>Mean challenger improvement across all tests.</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-card summary-card--best">
+            <small class="text-uppercase opacity-75">Best Challenger</small>
+            <div class="summary-value" style="font-size: 1.45rem;">{% if summary.best_test %}{{ summary.best_test.treatment_model_version }}{% else %}N/A{% endif %}</div>
+            <div>{% if summary.best_test %}{{ summary.best_test.improvement_pct|floatformat:2 }}% uplift in {{ summary.best_test.test_name }}{% else %}No completed comparison yet.{% endif %}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card ab-panel mb-4">
+    <div class="card-header">
+        <div class="ab-kicker mb-2">Live Experiments</div>
+        <h5 class="panel-title mb-1">Active Tests</h5>
+        <p class="panel-note">These tests are still open. Close them once the treatment outcome is clear.</p>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table test-table">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Control</th>
+                        <th>Treatment</th>
+                        <th>Improvement</th>
+                        <th>Status</th>
+                        <th>Started At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in active_tests %}
+                    <tr class="test-row">
+                        <td><strong>{{ test.test_name }}</strong></td>
+                        <td><span class="version-pill">{{ test.control_model_version }}</span></td>
+                        <td><span class="version-pill">{{ test.treatment_model_version }}</span></td>
+                        <td><span class="badge bg-success rounded-pill px-3 py-2">{{ test.improvement_pct|floatformat:2 }}%</span></td>
+                        <td><span class="badge bg-info rounded-pill px-3 py-2">{{ test.status }}</span></td>
+                        <td>{{ test.start_date|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'complete_ab_test' test.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" type="submit">Close Test</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">No active A/B tests found. Start one from the launch panel above.</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card ab-panel">
+    <div class="card-header">
+        <div class="ab-kicker mb-2">Closed Experiments</div>
+        <h5 class="panel-title mb-1">Past Tests</h5>
+        <p class="panel-note">Closed tests create a lightweight decision history for the models you have already compared.</p>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table test-table">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Winner</th>
+                        <th>Control MSE</th>
+                        <th>Treatment MSE</th>
+                        <th>Improvement</th>
+                        <th>Closed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in past_tests %}
+                    <tr class="test-row">
+                        <td><strong>{{ test.test_name }}</strong></td>
+                        <td><span class="version-pill">{{ test.treatment_model_version }}</span></td>
+                        <td>{{ test.control_mse|floatformat:6 }}</td>
+                        <td>{{ test.treatment_mse|floatformat:6 }}</td>
+                        <td><span class="badge bg-success rounded-pill px-3 py-2">{{ test.improvement_pct|floatformat:2 }}%</span></td>
+                        <td>{{ test.start_date|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">No past A/B tests found yet. Close an active test to create a result history.</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
