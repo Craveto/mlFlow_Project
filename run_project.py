@@ -75,6 +75,11 @@ def main():
         action="store_true",
         help="Train the ARIMA bundle during bootstrap if it is missing.",
     )
+    parser.add_argument(
+        "--no-reload",
+        action="store_true",
+        help="Disable Django's auto-reloader. Use this in service-managed environments.",
+    )
     args = parser.parse_args()
 
     env = os.environ.copy()
@@ -94,15 +99,16 @@ def main():
     if args.prefer_arima and not args.skip_train and not has_arima_bundle():
         run_step([sys.executable, "src/models/arima_model.py"], env=env)
 
-    run_step(
-        [
-            sys.executable,
-            "dashboard/manage.py",
-            "runserver",
-            f"{args.host}:{args.port}",
-        ],
-        env=env,
-    )
+    runserver_args = [
+        sys.executable,
+        "dashboard/manage.py",
+        "runserver",
+        f"{args.host}:{args.port}",
+    ]
+    if args.no_reload:
+        runserver_args.append("--noreload")
+
+    run_step(runserver_args, env=env)
 
 
 if __name__ == "__main__":

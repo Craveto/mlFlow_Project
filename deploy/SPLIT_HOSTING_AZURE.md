@@ -60,7 +60,7 @@ pip install -r /home/azureuser/timeseries/requirements.txt
 ```bash
 cd /home/azureuser/timeseries
 source /home/azureuser/timeseries/venv/bin/activate
-python run_project.py --host 127.0.0.1 --port 8000 --skip-train
+python run_project.py --host 127.0.0.1 --port 8000 --skip-train --no-reload
 ```
 
 In another terminal on the VM:
