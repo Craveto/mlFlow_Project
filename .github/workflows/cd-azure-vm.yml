@@ -1,0 +1,70 @@
+name: CD Azure VM
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Django system check
+        run: python dashboard/manage.py check
+
+      - name: API and frontend smoke check
+        run: python scripts/ci_smoke_check.py
+
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AZURE_VM_SSH_KEY }}
+
+      - name: Add VM host key
+        run: ssh-keyscan -H "${{ secrets.AZURE_VM_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Sync project to VM
+        run: |
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude "venv" \
+            ./ "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}:/home/${{ secrets.AZURE_VM_USER }}/timeseries/"
+
+      - name: Install and restart services on VM
+        run: |
+          ssh "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}" <<'EOF'
+          set -e
+          cd /home/${{ secrets.AZURE_VM_USER }}/timeseries
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          sudo cp deploy/systemd/timeseries-backend.service /etc/systemd/system/
+          sudo cp deploy/systemd/timeseries-frontend.service /etc/systemd/system/
+          sudo cp deploy/nginx/timeseries-split.conf /etc/nginx/sites-available/timeseries
+          sudo rm -f /etc/nginx/sites-enabled/default
+          sudo ln -sf /etc/nginx/sites-available/timeseries /etc/nginx/sites-enabled/timeseries
+          sudo systemctl daemon-reload
+          sudo systemctl enable timeseries-backend
+          sudo systemctl enable timeseries-frontend
+          sudo systemctl restart timeseries-backend
+          sudo systemctl restart timeseries-frontend
+          sudo nginx -t
+          sudo systemctl restart nginx
+          EOF

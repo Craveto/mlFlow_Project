@@ -1,0 +1,14 @@
+[Unit]
+Description=BTCUSD TimeSeries static frontend
+After=network.target
+
+[Service]
+User=azureuser
+Group=www-data
+WorkingDirectory=/home/azureuser/timeseries/frontend
+ExecStart=/usr/bin/python3 -m http.server 3000 --bind 127.0.0.1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

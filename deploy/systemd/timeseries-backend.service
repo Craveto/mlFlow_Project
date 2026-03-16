@@ -1,0 +1,15 @@
+[Unit]
+Description=BTCUSD TimeSeries Django API backend
+After=network.target
+
+[Service]
+User=azureuser
+Group=www-data
+WorkingDirectory=/home/azureuser/timeseries
+Environment="PATH=/home/azureuser/timeseries/venv/bin"
+ExecStart=/home/azureuser/timeseries/venv/bin/python /home/azureuser/timeseries/run_project.py --host 127.0.0.1 --port 8000 --skip-train
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

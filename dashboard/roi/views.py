@@ -34,12 +34,5 @@ def roi_index(request):
     best_strategy = roi_dashboard["best_strategy"]
     _sync_snapshot(best_strategy)
 
-    context = {
-        "best_strategy": best_strategy,
-        "strategies": roi_dashboard["strategies"],
-        "assumptions": roi_dashboard["assumptions"],
-        "context_data": roi_dashboard["context"],
-        "recommendation": roi_dashboard["recommendation"],
-        "history": ROIMetric.objects.all().order_by('-calculated_at')[:10],
-    }
+    context = {"api_url": "/api/roi/"}
     return render(request, 'dashboard/roi_index.html', context)

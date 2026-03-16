@@ -2,511 +2,59 @@
 
 {% block content %}
 <style>
-    .overview-title {
-        font-size: clamp(2rem, 4vw, 3rem);
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        margin-bottom: 0.35rem;
-    }
-
-    .overview-subtitle {
-        color: #5e6a7d;
-        max-width: 60rem;
-        margin-bottom: 0;
-    }
-
-    .context-strip {
-        border-radius: 28px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(240, 245, 252, 0.88));
-    }
-
-    .context-item small {
-        letter-spacing: 0.08em;
-    }
-
-    .hero-card {
-        padding: 1.65rem;
-        min-height: 100%;
-        color: #fff;
-        background: linear-gradient(135deg, #1d4ed8 0%, #3294ff 100%);
-        overflow: hidden;
-        position: relative;
-    }
-
-    .hero-card::after {
-        content: "";
-        position: absolute;
-        inset: auto -40px -60px auto;
-        width: 220px;
-        height: 220px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
-        filter: blur(8px);
-    }
-
-    .forecast-kicker {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.38rem 0.7rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.14);
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 1rem;
-    }
-
-    .hero-value {
-        font-size: clamp(2.2rem, 4vw, 3.4rem);
-        font-weight: 800;
-        line-height: 1;
-        margin-bottom: 0.85rem;
-    }
-
-    .hero-meta {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.9rem;
-        margin-top: 1.4rem;
-    }
-
-    .hero-meta-item {
-        padding: 0.85rem 0.95rem;
-        border-radius: 18px;
-        background: rgba(12, 24, 46, 0.22);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .hero-meta-item small,
-    .mini-card small {
-        display: block;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        opacity: 0.8;
-    }
-
-    .hero-meta-item strong,
-    .mini-stat strong {
-        display: block;
-        font-size: 1rem;
-        margin-top: 0.2rem;
-    }
-
-    .mini-card {
-        padding: 1.35rem;
-        min-height: 100%;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .mini-card:hover,
-    .hero-card:hover {
-        transform: translateY(-4px);
-    }
-
+    .overview-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.35rem; }
+    .overview-subtitle { color: #5e6a7d; max-width: 60rem; margin-bottom: 0; }
+    .context-strip { border-radius: 28px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(240, 245, 252, 0.88)); }
+    .hero-card { padding: 1.65rem; min-height: 100%; color: #fff; background: linear-gradient(135deg, #1d4ed8 0%, #3294ff 100%); overflow: hidden; position: relative; }
+    .forecast-kicker { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.38rem 0.7rem; border-radius: 999px; background: rgba(255, 255, 255, 0.14); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+    .hero-value, .mini-value { font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 800; line-height: 1; margin-bottom: 0.85rem; }
+    .hero-meta, .mini-grid { display: grid; gap: 0.9rem; }
+    .hero-meta { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 1.4rem; }
+    .hero-meta-item, .mini-stat { padding: 0.85rem 0.95rem; border-radius: 18px; background: rgba(12, 24, 46, 0.22); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .mini-card { padding: 1.35rem; min-height: 100%; color: #fff; overflow: hidden; }
     .mini-card--rnn { background: linear-gradient(135deg, #151c28 0%, #2b3441 100%); }
     .mini-card--arima { background: linear-gradient(135deg, #885822 0%, #a8723a 100%); }
     .mini-card--linear { background: linear-gradient(135deg, #62707f 0%, #89929c 100%); }
     .mini-card--mse { background: linear-gradient(135deg, #0f8a54 0%, #25a65b 100%); }
-
-    .mini-value {
-        font-size: 2rem;
-        font-weight: 800;
-        line-height: 1.05;
-        margin: 0.7rem 0 1rem;
-    }
-
-    .mini-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-    }
-
-    .mini-stat {
-        padding: 0.7rem 0.8rem;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.12);
-    }
-
-    .mini-footer {
-        color: rgba(255, 255, 255, 0.92);
-        font-size: 0.92rem;
-    }
-
-    .section-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.35rem 0.65rem;
-        border-radius: 999px;
-        background: rgba(21, 32, 51, 0.06);
-        color: #526072;
-        font-size: 0.76rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 0.8rem;
-    }
-
-    .panel-card {
-        border-radius: 28px;
-        overflow: hidden;
-    }
-
-    .panel-title {
-        font-size: 1.55rem;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-    }
-
-    .panel-subtitle {
-        color: #738095;
-        font-size: 0.95rem;
-        margin-bottom: 0;
-    }
-
-    .run-table {
-        margin-bottom: 0;
-    }
-
-    .run-table thead th {
-        color: #5d6980;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        border-bottom: 0;
-        padding-top: 0.6rem;
-        padding-bottom: 0.9rem;
-    }
-
-    .run-row {
-        background: rgba(255, 255, 255, 0.68);
-        border: 1px solid rgba(21, 32, 51, 0.06);
-    }
-
-    .run-row td {
-        vertical-align: middle;
-    }
-
-    .run-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.38rem 0.75rem;
-        border-radius: 999px;
-        background: rgba(21, 32, 51, 0.06);
-        color: #2a3648;
-        font-size: 0.83rem;
-        font-weight: 700;
-    }
-
-    .run-pill::before {
-        content: "";
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: currentColor;
-        opacity: 0.55;
-    }
-
-    .run-id {
-        font-weight: 700;
-        color: #233046;
-    }
-
-    .metric-cell {
-        font-weight: 700;
-        color: #19263b;
-    }
-
-    .registry-stack {
-        display: grid;
-        gap: 0.9rem;
-    }
-
-    .registry-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 1.05rem;
-        border-radius: 18px;
-        background: rgba(248, 250, 253, 0.92);
-        border: 1px solid rgba(21, 32, 51, 0.06);
-    }
-
-    .registry-meta strong {
-        display: block;
-        color: #1e2a3d;
-    }
-
-    .registry-meta small {
-        color: #738095;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-
-    .registry-badge {
-        padding: 0.45rem 0.8rem;
-        border-radius: 999px;
-        background: linear-gradient(135deg, #1d4ed8 0%, #3294ff 100%);
-        color: white;
-        font-weight: 700;
-        font-size: 0.82rem;
-    }
-
-    .registry-empty {
-        padding: 1rem 1.05rem;
-        border-radius: 18px;
-        background: rgba(248, 250, 253, 0.92);
-        border: 1px dashed rgba(21, 32, 51, 0.12);
-        color: #738095;
-    }
-
-    @media (max-width: 991.98px) {
-        .hero-meta {
-            grid-template-columns: 1fr;
-        }
-    }
+    .panel-card { border-radius: 28px; overflow: hidden; }
+    .panel-title { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.03em; }
+    .panel-subtitle { color: #738095; font-size: 0.95rem; margin-bottom: 0; }
+    .run-pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.38rem 0.75rem; border-radius: 999px; background: rgba(21, 32, 51, 0.06); color: #2a3648; font-size: 0.83rem; font-weight: 700; }
+    .registry-item { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.05rem; border-radius: 18px; background: rgba(248, 250, 253, 0.92); border: 1px solid rgba(21, 32, 51, 0.06); margin-bottom: 0.9rem; }
+    .registry-badge { padding: 0.45rem 0.8rem; border-radius: 999px; background: linear-gradient(135deg, #1d4ed8 0%, #3294ff 100%); color: white; font-weight: 700; font-size: 0.82rem; }
+    .loading-shell { padding: 3rem 1.5rem; border-radius: 28px; background: rgba(255, 255, 255, 0.82); color: #5e6a7d; text-align: center; }
 </style>
+
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <div>
         <div class="section-label">BTC-USD Hourly Forecast Hub</div>
         <h1 class="overview-title">BTCUSD Forecasting Dashboard Overview</h1>
         <p class="overview-subtitle">Live model snapshots from Yahoo Finance hourly BTC-USD data, with one clear next-hour forecast and side-by-side model comparisons.</p>
     </div>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-        </div>
-        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
-        </button>
-    </div>
 </div>
 
-<div class="card context-strip border-0 shadow-sm mb-4">
-    <div class="card-body py-3">
-        <div class="row g-3">
-            <div class="col-xl-3 col-md-6 context-item">
-                <small class="text-uppercase text-muted d-block">Data Source</small>
-                <strong>{{ data_context.data_source }}</strong>
-                <span class="text-muted">| {{ data_context.symbol }} | {{ data_context.data_frequency }}</span>
-            </div>
-            <div class="col-xl-3 col-md-6 context-item">
-                <small class="text-uppercase text-muted d-block">Coverage</small>
-                <strong>{{ data_context.coverage_start }}</strong>
-                <span class="text-muted">to {{ data_context.coverage_end }}</span>
-            </div>
-            <div class="col-xl-3 col-md-6 context-item">
-                <small class="text-uppercase text-muted d-block">Latest Market Date</small>
-                <strong>{{ data_context.latest_market_time }}</strong>
-            </div>
-            <div class="col-xl-3 col-md-6 context-item">
-                <small class="text-uppercase text-muted d-block">Dashboard Refreshed</small>
-                <strong>{{ data_context.dashboard_time }}</strong>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="overview-root" class="loading-shell">Loading overview data...</div>
+{% endblock %}
 
-<div class="row">
-    <div class="col-xl-6 mb-4">
-        <div class="card hero-card">
-            <div class="forecast-kicker">{{ active_source_label }} Active Model</div>
-            <div class="d-flex justify-content-between align-items-start gap-3">
-                <div>
-                    <h5 class="mb-2">{{ forecast_horizon }} Forecast</h5>
-                    <div class="hero-value">$ {{ active_forecast }}</div>
-                    <div class="text-white-50">Latest hourly close: $ {{ latest_close }}</div>
-                </div>
-                <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">{{ forecast_status }}</span>
-            </div>
-            <div class="hero-meta">
-                <div class="hero-meta-item">
-                    <small>Predicted Move</small>
-                    <strong>{{ active_forecast_delta|default:"N/A" }}</strong>
-                </div>
-                <div class="hero-meta-item">
-                    <small>Change vs Close</small>
-                    <strong>${{ active_forecast_change }}</strong>
-                </div>
-                <div class="hero-meta-item">
-                    <small>Bundle Updated</small>
-                    <strong>{{ active_model_updated }}</strong>
-                </div>
-            </div>
-            <div class="mt-3 text-white-50">
-                Last completed check: predicted ${{ active_validation.prediction }} vs actual ${{ active_validation.actual }} | abs error ${{ active_validation.error }}
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-6 mb-4">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card mini-card mini-card--rnn">
-                    <div class="forecast-kicker">{{ rnn_source_label }}</div>
-                    <h5>RNN {{ forecast_horizon }}</h5>
-                    <div class="mini-value">$ {{ rnn_forecast }}</div>
-                    <div class="mini-grid">
-                        <div class="mini-stat">
-                            <small>Move</small>
-                            <strong>{{ rnn_forecast_delta|default:"N/A" }}</strong>
-                        </div>
-                        <div class="mini-stat">
-                            <small>Change</small>
-                            <strong>${{ rnn_forecast_change }}</strong>
-                        </div>
-                    </div>
-                    <div class="mini-footer">{{ rnn_status }}</div>
-                    <div class="mini-footer">Last check error: ${{ rnn_validation.error }}</div>
-                    <div class="mini-footer">Updated: {{ rnn_model_updated }}</div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mini-card mini-card--arima">
-                    <div class="forecast-kicker">{{ arima_source_label }}</div>
-                    <h5>ARIMA {{ forecast_horizon }}</h5>
-                    <div class="mini-value">$ {{ arima_forecast }}</div>
-                    <div class="mini-grid">
-                        <div class="mini-stat">
-                            <small>Move</small>
-                            <strong>{{ arima_forecast_delta|default:"N/A" }}</strong>
-                        </div>
-                        <div class="mini-stat">
-                            <small>Change</small>
-                            <strong>${{ arima_forecast_change }}</strong>
-                        </div>
-                    </div>
-                    <div class="mini-footer">{{ arima_status }}</div>
-                    <div class="mini-footer">Last check error: ${{ arima_validation.error }}</div>
-                    <div class="mini-footer">Updated: {{ arima_model_updated }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-4 col-md-6 mb-4">
-        <div class="card mini-card mini-card--linear">
-            <div class="forecast-kicker">{{ linear_source_label }}</div>
-            <h5>Linear {{ forecast_horizon }}</h5>
-            <div class="mini-value">$ {{ linear_forecast }}</div>
-            <div class="mini-grid">
-                <div class="mini-stat">
-                    <small>Move</small>
-                    <strong>{{ linear_forecast_delta|default:"N/A" }}</strong>
-                </div>
-                <div class="mini-stat">
-                    <small>Change</small>
-                    <strong>${{ linear_forecast_change }}</strong>
-                </div>
-            </div>
-            <div class="mini-footer">Last check error: ${{ linear_validation.error }}</div>
-            <div class="mini-footer">Updated: {{ linear_model_updated }}</div>
-        </div>
-    </div>
-    <div class="col-xl-4 col-md-6 mb-4">
-        <div class="card mini-card mini-card--mse">
-            <div class="forecast-kicker">Model Quality</div>
-            <h5>Best Model MSE</h5>
-            <div class="mini-value">{{ best_model_metric }}</div>
-            <div class="mini-grid">
-                <div class="mini-stat">
-                    <small>Top Model</small>
-                    <strong>{{ best_model_name }}</strong>
-                </div>
-                <div class="mini-stat">
-                    <small>Interpretation</small>
-                    <strong>Lower is better</strong>
-                </div>
-            </div>
-            <div class="mini-footer">Best tracked run across available model families</div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-xl-8 mb-4">
-        <div class="card panel-card">
-            <div class="card-header">
-                <div class="section-label mb-2">Experiment Snapshot</div>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h5 class="panel-title mb-1">Best Run Per Model</h5>
-                        <p class="panel-subtitle">One top tracked run for each model family so comparisons stay balanced.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table run-table">
-                        <thead>
-                            <tr>
-                                <th>Run ID</th>
-                                <th>Start Time</th>
-                                <th>Model Type</th>
-                                <th>MSE</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for run in runs %}
-                            <tr class="run-row">
-                                <td class="run-id">{{ run.run_id|truncatechars:10 }}</td>
-                                <td>{{ run.start_time }}</td>
-                                <td><span class="run-pill">{{ run.model_type }}</span></td>
-                                <td class="metric-cell">{{ run.mse|floatformat:6 }}</td>
-                                <td><span class="badge {% if run.status == 'FINISHED' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">{{ run.status }}</span></td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="text-center">No experiment runs found.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-4 mb-4">
-        <div class="card panel-card">
-            <div class="card-header">
-                <div class="section-label mb-2">Registry</div>
-                <h5 class="panel-title mb-1">Model Registry Status</h5>
-                <p class="panel-subtitle">Tracked versions currently visible from MLflow registration.</p>
-            </div>
-            <div class="card-body">
-                <div class="registry-stack">
-                    {% for version in latest_versions %}
-                    <div class="registry-item">
-                        <div class="registry-meta">
-                            <small>Version</small>
-                            <strong>{{ version.version }}</strong>
-                        </div>
-                        <span class="registry-badge">{{ version.current_stage|default:"Unstaged" }}</span>
-                    </div>
-                    {% empty %}
-                    <div class="registry-empty">No registered versions yet. Saved local bundles are still powering the dashboard forecasts.</div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="card mt-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0">BTCUSD Price Forecast Visualization</h5>
-    </div>
-    <div class="card-body">
-        <div id="forecast-chart" style="height: 300px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border: 1px dashed #dee2e6;">
-            <p class="text-muted">Interactive Plotly visualization will be integrated here in Phase 4.</p>
-        </div>
-    </div>
-</div>
+{% block extra_scripts %}
+<script>
+    (function () {
+        const root = document.getElementById("overview-root");
+        const apiUrl = "{{ api_url }}";
+        function cardTemplate(title, card, variant) {
+            return `<div class="card mini-card ${variant}"><div class="forecast-kicker">${card.source_label}</div><h5>${title}</h5><div class="mini-value">$ ${card.forecast}</div><div class="mini-grid"><div class="mini-stat"><small>Move</small><strong>${card.delta_pct || "N/A"}</strong></div><div class="mini-stat"><small>Change</small><strong>$${card.change_amount}</strong></div></div><div>${card.status}</div><div>Last check error: $${card.validation.error}</div><div>Updated: ${card.updated_at}</div></div>`;
+        }
+        function runRows(runs) {
+            if (!runs.length) return '<tr><td colspan="5" class="text-center">No experiment runs found.</td></tr>';
+            return runs.map((run) => `<tr><td>${run.run_id.slice(0, 10)}</td><td>${run.start_time}</td><td><span class="run-pill">${run.model_type}</span></td><td>${run.mse === null ? "N/A" : run.mse.toFixed(6)}</td><td><span class="badge ${run.status === "FINISHED" ? "bg-success" : "bg-secondary"} rounded-pill px-3 py-2">${run.status}</span></td></tr>`).join("");
+        }
+        fetch(apiUrl).then((response) => response.json()).then((data) => {
+            const active = data.forecast_cards.active;
+            root.className = "";
+            root.innerHTML = `<div class="card context-strip border-0 shadow-sm mb-4"><div class="card-body py-3"><div class="row g-3"><div class="col-xl-3 col-md-6"><small class="text-uppercase text-muted d-block">Data Source</small><strong>${data.data_context.data_source}</strong><span class="text-muted">| ${data.data_context.symbol} | ${data.data_context.data_frequency}</span></div><div class="col-xl-3 col-md-6"><small class="text-uppercase text-muted d-block">Coverage</small><strong>${data.data_context.coverage_start}</strong><span class="text-muted">to ${data.data_context.coverage_end}</span></div><div class="col-xl-3 col-md-6"><small class="text-uppercase text-muted d-block">Latest Market Date</small><strong>${data.data_context.latest_market_time}</strong></div><div class="col-xl-3 col-md-6"><small class="text-uppercase text-muted d-block">Dashboard Refreshed</small><strong>${data.data_context.dashboard_time}</strong></div></div></div></div><div class="row"><div class="col-xl-6 mb-4"><div class="card hero-card"><div class="forecast-kicker">${active.source_label} Active Model</div><div class="d-flex justify-content-between align-items-start gap-3"><div><h5 class="mb-2">${active.forecast_horizon} Forecast</h5><div class="hero-value">$ ${active.forecast}</div><div class="text-white-50">Latest hourly close: $ ${active.latest_close}</div></div><span class="badge rounded-pill text-bg-light text-dark px-3 py-2">${active.status}</span></div><div class="hero-meta"><div class="hero-meta-item"><small>Predicted Move</small><strong>${active.delta_pct}</strong></div><div class="hero-meta-item"><small>Change vs Close</small><strong>$${active.change_amount}</strong></div><div class="hero-meta-item"><small>Bundle Updated</small><strong>${active.updated_at}</strong></div></div><div class="mt-3 text-white-50">Last completed check: predicted $${active.validation.prediction} vs actual $${active.validation.actual} | abs error $${active.validation.error}</div></div></div><div class="col-xl-6 mb-4"><div class="row g-4"><div class="col-md-6">${cardTemplate(`RNN ${data.forecast_horizon}`, data.forecast_cards.rnn, "mini-card--rnn")}</div><div class="col-md-6">${cardTemplate(`ARIMA ${data.forecast_horizon}`, data.forecast_cards.arima, "mini-card--arima")}</div></div></div><div class="col-xl-4 col-md-6 mb-4">${cardTemplate(`Linear ${data.forecast_horizon}`, data.forecast_cards.linear, "mini-card--linear")}</div><div class="col-xl-4 col-md-6 mb-4"><div class="card mini-card mini-card--mse"><div class="forecast-kicker">Model Quality</div><h5>Best Model MSE</h5><div class="mini-value">${data.best_model_metric}</div><div class="mini-grid"><div class="mini-stat"><small>Top Model</small><strong>${data.best_model_name}</strong></div><div class="mini-stat"><small>Interpretation</small><strong>Lower is better</strong></div></div><div>Best tracked run across available model families</div></div></div></div><div class="row mt-4"><div class="col-xl-8 mb-4"><div class="card panel-card"><div class="card-header"><h5 class="panel-title mb-1">Best Run Per Model</h5><p class="panel-subtitle">One top tracked run for each model family so comparisons stay balanced.</p></div><div class="card-body"><div class="table-responsive"><table class="table"><thead><tr><th>Run ID</th><th>Start Time</th><th>Model Type</th><th>MSE</th><th>Status</th></tr></thead><tbody>${runRows(data.runs)}</tbody></table></div></div></div></div><div class="col-xl-4 mb-4"><div class="card panel-card"><div class="card-header"><h5 class="panel-title mb-1">Model Registry Status</h5><p class="panel-subtitle">Tracked versions currently visible from MLflow registration.</p></div><div class="card-body">${data.registry_versions.length ? data.registry_versions.map((version) => `<div class="registry-item"><div><small>Version</small><strong>${version.version}</strong></div><span class="registry-badge">${version.stage}</span></div>`).join("") : '<div class="text-muted">No registered versions yet. Saved local bundles are still powering the dashboard forecasts.</div>'}</div></div></div></div><div class="card mt-4"><div class="card-header"><h5 class="card-title mb-0">BTCUSD Price Forecast Visualization</h5></div><div class="card-body"><div style="height: 300px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; border: 1px dashed #dee2e6;"><p class="text-muted mb-0">Interactive Plotly visualization will be integrated here in the next phase.</p></div></div></div>`;
+        }).catch((error) => {
+            root.innerHTML = `<div class="alert alert-danger rounded-4">Failed to load overview data: ${error.message}</div>`;
+        });
+    })();
+</script>
 {% endblock %}

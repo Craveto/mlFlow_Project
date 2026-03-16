@@ -1,3 +1,15 @@
 __pycache__/
 *.py[cod]
 artifacts/arima_forecast_bundle.joblib
+venv/
+.venv/
+env/
+dashboard/db.sqlite3
+dashboard/mlflow.db
+mlruns/
+data/processed/
+data/raw/
+*.log
+.pytest_cache/
+.idea/
+.vscode/
