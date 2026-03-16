@@ -3,7 +3,9 @@ name: CD Azure VM
 on:
   workflow_dispatch:
   push:
-    branches: ["main", "master"]
+    branches:
+      - main
+      - master
 
 jobs:
   deploy:
@@ -38,29 +40,28 @@ jobs:
 
       - name: Add VM host key
         run: |
-         mkdir -p ~/.ssh
-         ssh-keyscan -H "${{ secrets.AZURE_VM_HOST }}" >> ~/.ssh/known_hosts
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.AZURE_VM_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Verify SSH to VM
         run: |
           ssh -vvv \
-          -o BatchMode=yes \
-          -o StrictHostKeyChecking=yes \
-          "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}" \
-          "echo SSH_OK && whoami && hostname"
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}" \
+            "echo SSH_OK && whoami && hostname"
 
-       - name: Sync project to VM
-         run: |
-           rsync -az --delete \
-           -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes" \
-           --exclude ".git" \
-           --exclude "venv" \
-           ./ "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}:/home/${{ secrets.AZURE_VM_USER }}/timeseries/"
-
-
-       - name: Install and restart services on VM
+      - name: Sync project to VM
         run: |
-          ssh "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}" <<'EOF'
+          rsync -az --delete \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes" \
+            --exclude ".git" \
+            --exclude "venv" \
+            ./ "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}:/home/${{ secrets.AZURE_VM_USER }}/timeseries/"
+
+      - name: Install and restart services on VM
+        run: |
+          ssh "${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_HOST }}" <<EOF
           set -e
           cd /home/${{ secrets.AZURE_VM_USER }}/timeseries
           python3 -m venv venv
